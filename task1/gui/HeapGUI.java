@@ -12,9 +12,12 @@ import task1.task.*;
 
 public class HeapGUI extends JFrame {
 
+    /** Fixerad array från uppgiften – ändras ALDRIG */
+    private static final int[] FIXED_INPUT = {10, 12, 1, 14, 6, 5, 8, 15, 3, 9, 7, 4, 11, 13, 2};
+
     private JTextArea output;
     private JTextField inputField;
-    private int[] currentInput = {10, 12, 1, 14, 6, 5, 8, 15, 3, 9, 7, 4, 11, 13, 2};
+    private int[] currentInput = FIXED_INPUT.clone();
 
     // Visual panels
     private TreePanel treePanel1;
@@ -24,6 +27,7 @@ public class HeapGUI extends JFrame {
     private JTextArea traversalOutput1;
     private JTextArea traversalOutput2;
     private GraphPanel graphPanel;
+    private JTextArea graphExplanation;
     private JPanel visualPanel;
     private CardLayout cardLayout;
     private String currentTask = "A";
@@ -35,7 +39,7 @@ public class HeapGUI extends JFrame {
         editable input array, and XY graphs for complexity.
         */
 
-        setTitle("Seminar 3 – Binary Heap Tasks");
+        setTitle("Seminar 3 – Tasks 1");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int w = (int)(screenSize.width * 0.9);
         int h = (int)(screenSize.height * 0.9);
@@ -69,7 +73,7 @@ public class HeapGUI extends JFrame {
 
         JButton resetBtn = new JButton("Reset");
         resetBtn.addActionListener(ev -> {
-            currentInput = new int[]{10, 12, 1, 14, 6, 5, 8, 15, 3, 9, 7, 4, 11, 13, 2};
+            currentInput = FIXED_INPUT.clone();
             inputField.setText(arrayToString(currentInput));
         });
         arrayBtns.add(resetBtn);
@@ -152,8 +156,20 @@ public class HeapGUI extends JFrame {
         traversalSplit.setResizeWeight(0.5);
         traversalSplit.setDividerLocation(0.5);
 
-        // Graph view
+        // Graph view with explanation text below
         graphPanel = new GraphPanel("Time Complexity", "Input Size (N)", "Time (ns)");
+        graphExplanation = new JTextArea();
+        graphExplanation.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        graphExplanation.setEditable(false);
+        graphExplanation.setLineWrap(true);
+        graphExplanation.setWrapStyleWord(true);
+        graphExplanation.setMargin(new Insets(10, 14, 10, 14));
+        graphExplanation.setBackground(new Color(245, 245, 250));
+
+        JSplitPane graphWithText = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                graphPanel, new JScrollPane(graphExplanation));
+        graphWithText.setResizeWeight(0.6);
+        graphWithText.setDividerLocation(0.6);
 
         // Text view
         output = new JTextArea();
@@ -164,7 +180,7 @@ public class HeapGUI extends JFrame {
 
         visualPanel.add(detailSplit, "DETAIL");
         visualPanel.add(traversalSplit, "TRAVERSAL");
-        visualPanel.add(graphPanel, "GRAPH");
+        visualPanel.add(graphWithText, "GRAPH");
         visualPanel.add(textScroll, "TEXT");
 
         add(visualPanel, BorderLayout.CENTER);
@@ -265,7 +281,7 @@ public class HeapGUI extends JFrame {
     // ---- Task runners ----
 
     private void runTaskA(){
-        /** run Task 1a with current input – single tree + explanation */
+        /** run Task 1a – tree from input, text from FIXED array */
         currentTask = "A";
         parseInput();
 
@@ -276,13 +292,13 @@ public class HeapGUI extends JFrame {
 
         singleTreePanel.setTitle("Tree 1 – Insert ett-i-taget");
         singleTreePanel.setHeap(heap);
-        detailOutput.setText(TaskA.run(currentInput));
+        detailOutput.setText(TaskA.run(FIXED_INPUT));
         detailOutput.setCaretPosition(0);
         cardLayout.show(visualPanel, "DETAIL");
     }
 
     private void runTaskB(){
-        /** run Task 1b with current input – single tree + explanation */
+        /** run Task 1b – tree from input, text from FIXED array */
         currentTask = "B";
         parseInput();
 
@@ -291,16 +307,17 @@ public class HeapGUI extends JFrame {
 
         singleTreePanel.setTitle("Tree 2 – BuildHeap (bottom-up)");
         singleTreePanel.setHeap(heap);
-        detailOutput.setText(TaskB.run(currentInput));
+        detailOutput.setText(TaskB.run(FIXED_INPUT));
         detailOutput.setCaretPosition(0);
         cardLayout.show(visualPanel, "DETAIL");
     }
 
     private void runTaskC(){
-        /** run Task 1c: all 4 traversals on both trees + explanation */
+        /** run Task 1c – trees from input, text from FIXED array */
         currentTask = "C";
         parseInput();
 
+        // Tree diagrams use currentInput
         BinaryHeap tree1 = new BinaryHeap(currentInput.length + 10);
         for(int v : currentInput){
             tree1.insert(v);
@@ -311,18 +328,26 @@ public class HeapGUI extends JFrame {
         treePanel1.setHeap(tree1);
         treePanel2.setHeap(tree2);
 
+        // Explanatory text uses FIXED array
+        BinaryHeap fixed1 = new BinaryHeap(FIXED_INPUT.length + 10);
+        for(int v : FIXED_INPUT) fixed1.insert(v);
+        BinaryHeap fixed2 = new BinaryHeap(FIXED_INPUT.length + 10);
+        fixed2.buildHeap(FIXED_INPUT);
+
         // ── Left column: Tree 1 text ──
         StringBuilder sb1 = new StringBuilder();
         sb1.append("Tree 1 – Insert ett-i-taget\n");
         sb1.append("═══════════════════════════════════\n\n");
+        sb1.append("Fixerad input-array:\n");
+        sb1.append("[").append(arrayToString(FIXED_INPUT)).append("]\n\n");
         sb1.append("Metod: Insert element ett i taget med\n");
         sb1.append("percolate UP från botten till rot.\n\n");
         sb1.append("Traverseringar:\n");
         sb1.append("───────────────────────────────────\n");
-        sb1.append("Level-order: ").append(tree1.levelOrder()).append("\n");
-        sb1.append("Pre-order:   ").append(tree1.preOrder()).append("\n");
-        sb1.append("In-order:    ").append(tree1.inOrder()).append("\n");
-        sb1.append("Post-order:  ").append(tree1.postOrder()).append("\n\n");
+        sb1.append("Level-order: ").append(fixed1.levelOrder()).append("\n");
+        sb1.append("Pre-order:   ").append(fixed1.preOrder()).append("\n");
+        sb1.append("In-order:    ").append(fixed1.inOrder()).append("\n");
+        sb1.append("Post-order:  ").append(fixed1.postOrder()).append("\n\n");
 
         sb1.append("Förklaring:\n");
         sb1.append("───────────────────────────────────\n");
@@ -343,14 +368,16 @@ public class HeapGUI extends JFrame {
         StringBuilder sb2 = new StringBuilder();
         sb2.append("Tree 2 – BuildHeap (bottom-up)\n");
         sb2.append("═══════════════════════════════════\n\n");
+        sb2.append("Fixerad input-array:\n");
+        sb2.append("[").append(arrayToString(FIXED_INPUT)).append("]\n\n");
         sb2.append("Metod: Kopiera hela arrayen och anropa\n");
         sb2.append("percolateDown från ⌊n/2⌋ ner till rot.\n\n");
         sb2.append("Traverseringar:\n");
         sb2.append("───────────────────────────────────\n");
-        sb2.append("Level-order: ").append(tree2.levelOrder()).append("\n");
-        sb2.append("Pre-order:   ").append(tree2.preOrder()).append("\n");
-        sb2.append("In-order:    ").append(tree2.inOrder()).append("\n");
-        sb2.append("Post-order:  ").append(tree2.postOrder()).append("\n\n");
+        sb2.append("Level-order: ").append(fixed2.levelOrder()).append("\n");
+        sb2.append("Pre-order:   ").append(fixed2.preOrder()).append("\n");
+        sb2.append("In-order:    ").append(fixed2.inOrder()).append("\n");
+        sb2.append("Post-order:  ").append(fixed2.postOrder()).append("\n\n");
 
         sb2.append("Jämförelse:\n");
         sb2.append("───────────────────────────────────\n");
@@ -369,136 +396,241 @@ public class HeapGUI extends JFrame {
         cardLayout.show(visualPanel, "TRAVERSAL");
     }
 
+    private long median(long[] arr){
+        /** return the median of a sorted copy */
+        long[] sorted = arr.clone();
+        Arrays.sort(sorted);
+        return sorted[sorted.length / 2];
+    }
+
     private void runTaskD(){
-        /** run Task 1d: measure complexity with graph */
+        /** run Task 1d: measure complexity with graph (in background thread) */
         currentTask = "D";
-        parseInput();
-        int[] sizes = {100, 500, 1000, 5000, 10000, 50000, 100000};
 
-        double[] xData = new double[sizes.length];
-        double[] yInsert = new double[sizes.length];
-        double[] yBuild = new double[sizes.length];
+        // Show a "running" message immediately
+        graphPanel.clearData();
+        graphExplanation.setText("Mäter... vänta.");
+        cardLayout.show(visualPanel, "GRAPH");
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Task 1d – Complexity Measurement\n\n");
-        sb.append(String.format("%-10s %22s %22s\n", "N", "Insert one-by-one (ns)", "BuildHeap (ns)"));
-        sb.append("─".repeat(56)).append("\n");
+        new Thread(() -> {
+            int[] sizes = {100, 500, 1000, 5000, 10000, 50000, 100000};
+            int RUNS = 5;
 
-        for(int si = 0; si < sizes.length; si++){
-            int n = sizes[si];
-            Random rand = new Random(42);
-            int[] input = new int[n];
-            for(int i = 0; i < n; i++){
-                input[i] = rand.nextInt(n * 10);
+            double[] xData = new double[sizes.length];
+            double[] yInsert = new double[sizes.length];
+            double[] yBuild = new double[sizes.length];
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Task 1d – Complexity Measurement (median of ").append(RUNS).append(" runs)\n\n");
+            sb.append(String.format("%-10s %22s %22s\n", "N", "Insert one-by-one (ns)", "BuildHeap (ns)"));
+            sb.append("─".repeat(56)).append("\n");
+
+            for(int si = 0; si < sizes.length; si++){
+                int n = sizes[si];
+                Random rand = new Random(42);
+                int[] input = new int[n];
+                for(int i = 0; i < n; i++){
+                    input[i] = rand.nextInt(n * 10);
+                }
+
+                // Warm up JIT
+                for(int w = 0; w < 3; w++){
+                    BinaryHeap warmup = new BinaryHeap(n + 10);
+                    for(int v : input) warmup.insert(v);
+                    warmup = new BinaryHeap(n + 10);
+                    warmup.buildHeap(input);
+                }
+
+                long[] timesInsert = new long[RUNS];
+                long[] timesBuild = new long[RUNS];
+
+                for(int r = 0; r < RUNS; r++){
+                    // Algorithm 1: Insert one-by-one
+                    long start1 = System.nanoTime();
+                    BinaryHeap heap1 = new BinaryHeap(n + 10);
+                    for(int v : input) heap1.insert(v);
+                    timesInsert[r] = System.nanoTime() - start1;
+
+                    // Algorithm 2: BuildHeap
+                    long start2 = System.nanoTime();
+                    BinaryHeap heap2 = new BinaryHeap(n + 10);
+                    heap2.buildHeap(input);
+                    timesBuild[r] = System.nanoTime() - start2;
+                }
+
+                long time1 = median(timesInsert);
+                long time2 = median(timesBuild);
+
+                xData[si] = n;
+                yInsert[si] = time1;
+                yBuild[si] = time2;
+
+                sb.append(String.format("%-10d %19d ns %19d ns\n", n, time1, time2));
             }
 
-            // Warm up
-            BinaryHeap warmup = new BinaryHeap(n + 10);
-            for(int v : input) warmup.insert(v);
-            warmup = new BinaryHeap(n + 10);
-            warmup.buildHeap(input);
+            sb.append("\nInsert one-by-one: O(n log n) worst case\n");
+            sb.append("BuildHeap:         O(n) using bottom-up construction\n");
 
-            // Algorithm 1: Insert one-by-one
-            long start1 = System.nanoTime();
-            BinaryHeap heap1 = new BinaryHeap(n + 10);
-            for(int v : input) heap1.insert(v);
-            long time1 = System.nanoTime() - start1;
+            String tableText = sb.toString();
 
-            // Algorithm 2: BuildHeap
-            long start2 = System.nanoTime();
-            BinaryHeap heap2 = new BinaryHeap(n + 10);
-            heap2.buildHeap(input);
-            long time2 = System.nanoTime() - start2;
+            String explanation =
+                "VAD GRAFEN VISAR\n" +
+                "════════════════\n" +
+                "Grafen jämför tidsåtgången (i nanosekunder) för två olika sätt att bygga en min-heap " +
+                "med ökande antal element (N = 100 till 100 000).\n\n" +
+                "• Röd linje – Insert ett-i-taget: Varje element sätts in med insert(), som placerar " +
+                "elementet sist i arrayen och sedan 'percolate up' tills heap-egenskapen gäller. " +
+                "Varje insert tar O(log n) i värsta fall, och för n element blir totalen O(n log n).\n\n" +
+                "• Blå linje – BuildHeap (bottom-up): Alla element kopieras in i arrayen på en gång, " +
+                "sedan anropas percolateDown från mitten (⌊n/2⌋) ner till rot. Denna metod är O(n) " +
+                "tack vare att de flesta noder befinner sig nära botten och behöver röra sig kort.\n\n" +
+                "HUR MÄTNINGEN GÖRS\n" +
+                "═══════════════════\n" +
+                "1. För varje storlek N genereras samma slumpmässiga data (seed = 42).\n" +
+                "2. JIT-uppvärmning: 3 omgångar körs innan mätningen börjar, så att JVM:s " +
+                "Just-In-Time-kompilator har optimerat koden.\n" +
+                "3. Varje mätpunkt körs " + RUNS + " gånger. Medianen (mittvärdet) väljs för att " +
+                "filtrera bort enstaka avvikelser orsakade av garbage collection eller OS-schemaläggning.\n" +
+                "4. Tid mäts med System.nanoTime() som ger nanosekundsprecision.\n\n" +
+                "MÄTDATA\n" +
+                "═══════\n" +
+                tableText;
 
-            xData[si] = n;
-            yInsert[si] = time1;
-            yBuild[si] = time2;
-
-            sb.append(String.format("%-10d %19d ns %19d ns\n", n, time1, time2));
-        }
-
-        sb.append("\nInsert one-by-one: O(n log n) worst case\n");
-        sb.append("BuildHeap:         O(n) using bottom-up construction\n");
-
-        graphPanel.clearData();
-        graphPanel.addSeries("Insert one-by-one  O(n log n)", xData, yInsert);
-        graphPanel.addSeries("BuildHeap  O(n)", xData, yBuild);
-
-        output.setText(sb.toString());
-        cardLayout.show(visualPanel, "GRAPH");
+            // Update UI on EDT
+            SwingUtilities.invokeLater(() -> {
+                graphPanel.clearData();
+                graphPanel.addSeries("Insert one-by-one  O(n log n)", xData, yInsert);
+                graphPanel.addSeries("BuildHeap  O(n)", xData, yBuild);
+                graphExplanation.setText(explanation);
+                graphExplanation.setCaretPosition(0);
+                cardLayout.show(visualPanel, "GRAPH");
+            });
+        }, "TaskD-benchmark").start();
     }
 
     private void runTaskE(){
-        /** run Task 1e: compare deleteMin vs insert costs with graph */
+        /** run Task 1e: compare deleteMin vs insert costs with graph (in background thread) */
         currentTask = "E";
-        parseInput();
-        int[] sizes = {100, 500, 1000, 5000, 10000};
-        int opsPerSize = 1000;
 
-        double[] xData = new double[sizes.length];
-        double[] yInsertAvg = new double[sizes.length];
-        double[] yDeleteAvg = new double[sizes.length];
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Task 1e – Priority Queue: deleteMin vs insert\n\n");
-        sb.append(String.format("%-8s %20s %20s\n", "N", "Avg Insert (ns)", "Avg DeleteMin (ns)"));
-        sb.append("─".repeat(50)).append("\n");
-
-        for(int si = 0; si < sizes.length; si++){
-            int n = sizes[si];
-            Random rand = new Random(42);
-            int[] input = new int[n];
-            for(int i = 0; i < n; i++){
-                input[i] = rand.nextInt(n * 10);
-            }
-
-            // Build heap for insert test
-            BinaryHeap heapIns = new BinaryHeap(n + opsPerSize + 10);
-            heapIns.buildHeap(input);
-
-            long start = System.nanoTime();
-            for(int i = 0; i < opsPerSize; i++){
-                heapIns.insert(rand.nextInt(n * 10));
-            }
-            long insertTime = System.nanoTime() - start;
-
-            // Build heap for deleteMin test
-            BinaryHeap heapDel = new BinaryHeap(n + 10);
-            heapDel.buildHeap(input);
-
-            start = System.nanoTime();
-            int delOps = Math.min(opsPerSize, n - 1);
-            for(int i = 0; i < delOps; i++){
-                heapDel.deleteMin();
-            }
-            long deleteTime = System.nanoTime() - start;
-
-            xData[si] = n;
-            yInsertAvg[si] = (double) insertTime / opsPerSize;
-            yDeleteAvg[si] = (double) deleteTime / delOps;
-
-            sb.append(String.format("%-8d %17.0f ns %17.0f ns\n",
-                    n, yInsertAvg[si], yDeleteAvg[si]));
-        }
-
-        sb.append("\nConclusion:\n");
-        sb.append("Insert is O(log n) worst case but often O(1) average.\n");
-        sb.append("DeleteMin is always O(log n) since the new root must\n");
-        sb.append("percolate down through the entire height of the tree.\n");
-        sb.append("Therefore deleteMin is typically more expensive than insert.\n");
-
+        // Show a "running" message immediately
         graphPanel.clearData();
-        graphPanel.addSeries("Avg Insert", xData, yInsertAvg);
-        graphPanel.addSeries("Avg DeleteMin", xData, yDeleteAvg);
-
-        output.setText(sb.toString());
+        graphExplanation.setText("Mäter... vänta.");
         cardLayout.show(visualPanel, "GRAPH");
+
+        new Thread(() -> {
+            int[] sizes = {100, 500, 1000, 5000, 10000};
+            int opsPerSize = 1000;
+            int RUNS = 5;
+
+            double[] xData = new double[sizes.length];
+            double[] yInsertAvg = new double[sizes.length];
+            double[] yDeleteAvg = new double[sizes.length];
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Task 1e – Priority Queue: deleteMin vs insert (median of ").append(RUNS).append(" runs)\n\n");
+            sb.append(String.format("%-8s %20s %20s\n", "N", "Avg Insert (ns)", "Avg DeleteMin (ns)"));
+            sb.append("─".repeat(50)).append("\n");
+
+            for(int si = 0; si < sizes.length; si++){
+                int n = sizes[si];
+                Random rand0 = new Random(42);
+                int[] input = new int[n];
+                for(int i = 0; i < n; i++){
+                    input[i] = rand0.nextInt(n * 10);
+                }
+
+                // Warm up JIT
+                for(int w = 0; w < 3; w++){
+                    BinaryHeap warmup = new BinaryHeap(n + opsPerSize + 10);
+                    warmup.buildHeap(input);
+                    Random rw = new Random(42);
+                    for(int i = 0; i < opsPerSize; i++) warmup.insert(rw.nextInt(n * 10));
+                    warmup = new BinaryHeap(n + 10);
+                    warmup.buildHeap(input);
+                    for(int i = 0; i < Math.min(opsPerSize, n - 1); i++) warmup.deleteMin();
+                }
+
+                long[] timesInsert = new long[RUNS];
+                long[] timesDelete = new long[RUNS];
+                int delOps = Math.min(opsPerSize, n - 1);
+
+                for(int r = 0; r < RUNS; r++){
+                    // Insert test
+                    BinaryHeap heapIns = new BinaryHeap(n + opsPerSize + 10);
+                    heapIns.buildHeap(input);
+                    Random rand = new Random(42);
+
+                    long start = System.nanoTime();
+                    for(int i = 0; i < opsPerSize; i++){
+                        heapIns.insert(rand.nextInt(n * 10));
+                    }
+                    timesInsert[r] = System.nanoTime() - start;
+
+                    // DeleteMin test
+                    BinaryHeap heapDel = new BinaryHeap(n + 10);
+                    heapDel.buildHeap(input);
+
+                    start = System.nanoTime();
+                    for(int i = 0; i < delOps; i++){
+                        heapDel.deleteMin();
+                    }
+                    timesDelete[r] = System.nanoTime() - start;
+                }
+
+                long insertTime = median(timesInsert);
+                long deleteTime = median(timesDelete);
+
+                xData[si] = n;
+                yInsertAvg[si] = (double) insertTime / opsPerSize;
+                yDeleteAvg[si] = (double) deleteTime / delOps;
+
+                sb.append(String.format("%-8d %17.0f ns %17.0f ns\n",
+                        n, yInsertAvg[si], yDeleteAvg[si]));
+            }
+
+            String tableText = sb.toString();
+
+            String explanation =
+                "VAD GRAFEN VISAR\n" +
+                "════════════════\n" +
+                "Grafen jämför den genomsnittliga tiden (i nanosekunder) per operation " +
+                "för insert och deleteMin i en prioritetskö (min-heap), med ökande heapstorlek " +
+                "(N = 100 till 10 000).\n\n" +
+                "• Röd linje – Genomsnittlig insert-tid: Varje insert placerar elementet sist " +
+                "och 'percolate up'. Värsta fallet är O(log n), men i praktiken hamnar de flesta " +
+                "nya element nära botten, så genomsnittet närmar sig O(1).\n\n" +
+                "• Blå linje – Genomsnittlig deleteMin-tid: DeleteMin tar bort roten (minsta), " +
+                "flyttar sista elementet till roten och 'percolate down'. Elementet måste alltid " +
+                "jämföras nedåt genom hela höjden, så det är O(log n) varje gång.\n\n" +
+                "Slutsats: DeleteMin är konsekvent dyrare än insert eftersom percolate down " +
+                "alltid traverserar hela trädets höjd, medan percolate up ofta stannar tidigt.\n\n" +
+                "HUR MÄTNINGEN GÖRS\n" +
+                "═══════════════════\n" +
+                "1. För varje storlek N byggs en min-heap med buildHeap (seed = 42).\n" +
+                "2. JIT-uppvärmning: 3 omgångar körs innan mätningen börjar.\n" +
+                "3. " + opsPerSize + " operationer utförs per mätning.\n" +
+                "4. Varje mätpunkt körs " + RUNS + " gånger. Medianen väljs för stabilitet.\n" +
+                "5. Genomsnittstid = total tid / antal operationer.\n" +
+                "6. Tid mäts med System.nanoTime() (nanosekundsprecision).\n\n" +
+                "MÄTDATA\n" +
+                "═══════\n" +
+                tableText;
+
+            // Update UI on EDT
+            SwingUtilities.invokeLater(() -> {
+                graphPanel.clearData();
+                graphPanel.addSeries("Avg Insert", xData, yInsertAvg);
+                graphPanel.addSeries("Avg DeleteMin", xData, yDeleteAvg);
+                graphExplanation.setText(explanation);
+                graphExplanation.setCaretPosition(0);
+                cardLayout.show(visualPanel, "GRAPH");
+            });
+        }, "TaskE-benchmark").start();
     }
 
     private void runAll(){
         /** show all text output */
         currentTask = "ALL";
-        parseInput();
         output.setText(
                 TaskA.run() + "\n\n" +
                 TaskB.run() + "\n\n" +

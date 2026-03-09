@@ -1,16 +1,15 @@
 // TreePanel.java
 package task1.gui;
 
-import javax.swing.*;
 import java.awt.*;
-
+import javax.swing.*;
 import task1.heap.BinaryHeap;
 
 public class TreePanel extends JPanel {
 
     private BinaryHeap heap;
     private String title;
-    private static final int NODE_RADIUS = 18;
+    private static final int NODE_RADIUS = 15;
     private static final int VERTICAL_GAP = 55;
 
     public TreePanel(String title){
