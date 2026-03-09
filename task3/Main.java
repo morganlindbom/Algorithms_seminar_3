@@ -13,6 +13,7 @@ public class Main {
         The GUI will manage the solver execution and visualization.
         */
 
+        @SuppressWarnings("unused")
         PuzzleGUI gui = new PuzzleGUI();
     }
 }
