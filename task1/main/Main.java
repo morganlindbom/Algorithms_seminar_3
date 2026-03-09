@@ -11,6 +11,7 @@ public class Main {
 
         Starts the Heap GUI application.
         */
+        @SuppressWarnings("unused")
         HeapGUI gui = new HeapGUI();
     }
 }
