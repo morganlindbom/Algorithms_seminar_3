@@ -2,29 +2,30 @@
 
 package task2.visualizer;
 
-import task2.gui.HashGUI;
-import task2.gui.TablePanel;
-import task2.gui.ControlPanel;
-
+import javax.swing.SwingUtilities;
 import task2.data.InputNumbers;
-
+import task2.gui.ControlPanel;
+import task2.gui.HashGUI;
+import task2.gui.NumbersPanel;
+import task2.gui.ProcessPanel;
+import task2.gui.TablePanel;
+import task2.hash.HashFunction;
 import task2.hash.HashTableChaining;
 import task2.hash.HashTableLinearProbing;
 import task2.hash.HashTableQuadraticProbing;
-import task2.hash.HashFunction;
-
-import javax.swing.SwingUtilities;
 
 public class HashVisualizer implements Runnable {
 
     private HashGUI gui;
+    private NumbersPanel numbersPanel;
     private TablePanel tablePanel;
     private ControlPanel controlPanel;
+    private ProcessPanel processPanel;
 
     private boolean running = false;
     private boolean paused = false;
 
-    public HashVisualizer(HashGUI gui, TablePanel tablePanel, ControlPanel controlPanel) {
+    public HashVisualizer(HashGUI gui, NumbersPanel numbersPanel, TablePanel tablePanel, ControlPanel controlPanel, ProcessPanel processPanel) {
     /**
      * Creates the visualizer controller.
      *
@@ -41,8 +42,10 @@ public class HashVisualizer implements Runnable {
      */
 
         this.gui = gui;
+        this.numbersPanel = numbersPanel;
         this.tablePanel = tablePanel;
         this.controlPanel = controlPanel;
+        this.processPanel = processPanel;
 
     }
 
@@ -114,13 +117,30 @@ public class HashVisualizer implements Runnable {
         HashTableLinearProbing linear = new HashTableLinearProbing(10);
         HashTableQuadraticProbing quadratic = new HashTableQuadraticProbing(10);
 
-        for (int number : numbers) {
+        String algorithmName = switch (algorithm) {
+            case "LINEAR" -> "Linear Probing";
+            case "QUADRATIC" -> "Quadratic Probing";
+            default -> "Separate Chaining";
+        };
+
+        updateProcess("Algorithm: " + algorithmName + "\n\nStarting insertion...\n\n");
+
+        for (int i = 0; i < numbers.length; i++) {
+
+            int number = numbers[i];
 
             if (!running) break;
 
             waitIfPaused();
 
+            highlightNumberProcessing(i);
+
             int index = hashFunction.hash(number);
+
+            StringBuilder process = new StringBuilder();
+            process.append("Step ").append(i + 1).append(":\n");
+            process.append("Processing number: ").append(number).append("\n");
+            process.append("Hash calculation: ").append(number).append(" mod 10 = ").append(index).append("\n");
 
             updateCalculation(number + " mod 10 = " + index);
 
@@ -133,20 +153,39 @@ public class HashVisualizer implements Runnable {
             if (algorithm.equals("CHAINING")) {
 
                 finalIndex = chaining.insert(number);
+                process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
 
             }
 
             if (algorithm.equals("LINEAR")) {
 
+                int probeIndex = index;
+                while (linear.getTable()[probeIndex] != null) {
+                    process.append("Collision detected at index ").append(probeIndex).append("\n");
+                    probeIndex = (probeIndex + 1) % 10;
+                    process.append("Linear probing -> checking index ").append(probeIndex).append("\n");
+                }
                 finalIndex = linear.insert(number);
+                process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
 
             }
 
             if (algorithm.equals("QUADRATIC")) {
 
+                int probeIndex = index;
+                int step = 1;
+                while (quadratic.getTable()[probeIndex] != null) {
+                    process.append("Collision detected at index ").append(probeIndex).append("\n");
+                    probeIndex = (index + (step * step)) % 10;
+                    process.append("Quadratic probing -> checking index ").append(probeIndex).append("\n");
+                    step++;
+                }
                 finalIndex = quadratic.insert(number);
+                process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
 
             }
+
+            appendProcess(process.toString());
 
             if (algorithm.equals("CHAINING")) {
                 appendValue(finalIndex, number);
@@ -154,6 +193,7 @@ public class HashVisualizer implements Runnable {
                 insertValue(finalIndex, number);
             }
 
+            highlightNumberInserted(i);
             highlightInserted(finalIndex);
 
             sleep(delay);
@@ -161,6 +201,33 @@ public class HashVisualizer implements Runnable {
         }
 
         running = false;
+
+    }
+
+    private void highlightNumberProcessing(int index) {
+    /**
+     * Highlights the current number in NumbersPanel as processing (yellow).
+     */
+
+        SwingUtilities.invokeLater(() -> {
+
+            numbersPanel.clearHighlights();
+            numbersPanel.highlightProcessing(index);
+
+        });
+
+    }
+
+    private void highlightNumberInserted(int index) {
+    /**
+     * Highlights the current number in NumbersPanel as inserted (green).
+     */
+
+        SwingUtilities.invokeLater(() -> {
+
+            numbersPanel.highlightInserted(index);
+
+        });
 
     }
 
@@ -225,6 +292,32 @@ public class HashVisualizer implements Runnable {
         SwingUtilities.invokeLater(() -> {
 
             gui.updateCalculation(text);
+
+        });
+
+    }
+
+    private void appendProcess(String text) {
+    /**
+     * Appends text to the process explanation panel.
+     */
+
+        SwingUtilities.invokeLater(() -> {
+
+            processPanel.appendProcess(text);
+
+        });
+
+    }
+
+    private void updateProcess(String text) {
+    /**
+     * Updates the process explanation panel.
+     */
+
+        SwingUtilities.invokeLater(() -> {
+
+            processPanel.updateProcess(text);
 
         });
 

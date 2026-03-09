@@ -3,6 +3,7 @@
 package task2.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
@@ -36,7 +37,7 @@ public class TablePanel extends JPanel {
      * index | value
      */
 
-        setLayout(new GridLayout(10, 2, 5, 5));
+        setLayout(new GridLayout(10, 2, 6, 6));
         setBorder(BorderFactory.createTitledBorder("Hash Table"));
 
         indexLabels = new JLabel[10];
@@ -48,12 +49,16 @@ public class TablePanel extends JPanel {
 
             indexLabels[i] = new JLabel(String.valueOf(i));
             indexLabels[i].setFont(font);
+            indexLabels[i].setPreferredSize(new Dimension(30, 40));
+            indexLabels[i].setHorizontalAlignment(JLabel.CENTER);
 
             valueLabels[i] = new JLabel("");
             valueLabels[i].setOpaque(true);
             valueLabels[i].setBackground(Color.WHITE);
             valueLabels[i].setBorder(BorderFactory.createLineBorder(Color.GRAY));
             valueLabels[i].setFont(font);
+            valueLabels[i].setPreferredSize(new Dimension(120, 40));
+            valueLabels[i].setHorizontalAlignment(JLabel.LEFT);
 
             add(indexLabels[i]);
             add(valueLabels[i]);

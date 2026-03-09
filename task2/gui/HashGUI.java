@@ -2,14 +2,14 @@
 
 package task2.gui;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.BorderFactory;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.Font;
-
+import java.awt.GridLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import task2.visualizer.HashVisualizer;
 
 /**
@@ -32,8 +32,10 @@ import task2.visualizer.HashVisualizer;
  */
 public class HashGUI extends JFrame {
 
+    private NumbersPanel numbersPanel;
     private TablePanel tablePanel;
     private ControlPanel controlPanel;
+    private ProcessPanel processPanel;
 
     private JLabel calculationLabel;
     private JLabel explanationLabel;
@@ -44,10 +46,9 @@ public class HashGUI extends JFrame {
      *
      * The window uses a BorderLayout to organize the interface:
      *
-     * NORTH  -> numbers and hash function
-     * CENTER -> visual hash table
+     * NORTH  -> hash function and calculation
+     * CENTER -> numbers panel (WEST) + table (CENTER) + controls (EAST)
      * SOUTH  -> explanation text
-     * EAST   -> control panel (Run / Pause / Clean / Delay)
      */
 
         setTitle("Hash Table Visualizer - Task 2");
@@ -56,8 +57,7 @@ public class HashGUI extends JFrame {
         setLayout(new BorderLayout());
 
         createTopPanel();
-        createCenterPanel();
-        createControlPanel();
+        createMainPanel();
         createExplanationPanel();
         connectVisualizer();
 
@@ -69,12 +69,15 @@ public class HashGUI extends JFrame {
      * Connects the HashVisualizer to the control buttons.
      */
 
-        HashVisualizer visualizer = new HashVisualizer(this, tablePanel, controlPanel);
-
         controlPanel.getRunButton().addActionListener(e -> {
             tablePanel.clearTable();
-            visualizer.stop();
-            HashVisualizer newVis = new HashVisualizer(this, tablePanel, controlPanel);
+            numbersPanel.clearHighlights();
+            processPanel.clear();
+            Object oldVis = controlPanel.getRunButton().getClientProperty("visualizer");
+            if (oldVis instanceof HashVisualizer v) {
+                v.stop();
+            }
+            HashVisualizer newVis = new HashVisualizer(this, numbersPanel, tablePanel, controlPanel, processPanel);
             controlPanel.getRunButton().putClientProperty("visualizer", newVis);
             newVis.start();
         });
@@ -98,6 +101,8 @@ public class HashGUI extends JFrame {
                 v.stop();
             }
             tablePanel.clearTable();
+            numbersPanel.clearHighlights();
+            processPanel.clear();
             controlPanel.getPauseButton().setText("Pause");
             updateCalculation("");
         });
@@ -108,18 +113,12 @@ public class HashGUI extends JFrame {
      * Creates the top information panel.
      *
      * This panel shows:
-     * - the numbers used in the task
      * - the hash function definition
      * - the current hash calculation
      */
 
         JPanel topPanel = new JPanel();
-        topPanel.setLayout(new GridLayout(3,1));
-
-        JLabel numbersLabel = new JLabel(
-            "Numbers: 4371   1323   6173   4199   4344   9679   1989"
-        );
-        numbersLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        topPanel.setLayout(new GridLayout(2, 1));
 
         JLabel hashLabel = new JLabel("Hash Function:  h(x) = x mod 10");
         hashLabel.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -127,30 +126,42 @@ public class HashGUI extends JFrame {
         calculationLabel = new JLabel("Calculation: ");
         calculationLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-        topPanel.add(numbersLabel);
         topPanel.add(hashLabel);
         topPanel.add(calculationLabel);
 
         add(topPanel, BorderLayout.NORTH);
     }
 
-    private void createCenterPanel() {
+    private void createMainPanel() {
     /**
-     * Creates the center panel containing the visual hash table.
+     * Creates the main center panel containing:
+     * WEST   -> NumbersPanel (input numbers)
+     * CENTER -> TablePanel (hash table)
+     * EAST   -> ControlPanel (buttons and delay)
      */
 
+        numbersPanel = new NumbersPanel();
         tablePanel = new TablePanel();
-        add(tablePanel, BorderLayout.CENTER);
-    }
-
-    private void createControlPanel() {
-    /**
-     * Creates the control panel containing buttons
-     * and delay configuration.
-     */
-
         controlPanel = new ControlPanel();
-        add(controlPanel, BorderLayout.EAST);
+        processPanel = new ProcessPanel();
+
+        JPanel numbersWrapper = new JPanel(new BorderLayout());
+        numbersWrapper.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        numbersWrapper.add(numbersPanel);
+
+        JPanel tableWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        tableWrapper.add(tablePanel);
+
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(processPanel, BorderLayout.CENTER);
+        rightPanel.add(controlPanel, BorderLayout.EAST);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(numbersWrapper, BorderLayout.WEST);
+        centerPanel.add(tableWrapper, BorderLayout.CENTER);
+        centerPanel.add(rightPanel, BorderLayout.EAST);
+
+        add(centerPanel, BorderLayout.CENTER);
     }
 
     private void createExplanationPanel() {
