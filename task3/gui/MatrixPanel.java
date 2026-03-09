@@ -29,9 +29,6 @@ public class MatrixPanel extends JPanel {
                 {'f','g','d','t'}
 
         };
-
-        setPreferredSize(new Dimension(280,280));
-        setMaximumSize(new Dimension(280,280));
     }
 
     public char[][] getGrid(){
@@ -65,11 +62,19 @@ public class MatrixPanel extends JPanel {
 
         super.paintComponent(g);
 
-        int cell = 70;
+        int rows = grid.length;
+        int cols = grid[0].length;
+        int cellW = getWidth() / cols;
+        int cellH = getHeight() / rows;
+        int cell = Math.max(1, Math.min(cellW, cellH));
 
-        for(int r=0;r<grid.length;r++){
+        Font font = new Font("SansSerif", Font.BOLD, cell / 2);
+        g.setFont(font);
+        FontMetrics fm = g.getFontMetrics();
 
-            for(int c=0;c<grid[0].length;c++){
+        for(int r=0;r<rows;r++){
+
+            for(int c=0;c<cols;c++){
 
                 int x = c*cell;
                 int y = r*cell;
@@ -80,11 +85,10 @@ public class MatrixPanel extends JPanel {
                 g.setColor(Color.BLACK);
                 g.drawRect(x,y,cell,cell);
 
-                g.drawString(
-                        String.valueOf(grid[r][c]).toUpperCase(),
-                        x+30,
-                        y+40
-                );
+                String ch = String.valueOf(grid[r][c]).toUpperCase();
+                int tx = x + (cell - fm.stringWidth(ch)) / 2;
+                int ty = y + (cell + fm.getAscent() - fm.getDescent()) / 2;
+                g.drawString(ch, tx, ty);
             }
         }
 

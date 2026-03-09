@@ -14,6 +14,8 @@ public class WordPuzzleSolver {
 
     private Direction[] directions;
 
+    private long checkCounter;
+
     public WordPuzzleSolver(char[][] grid,Dictionary dictionary){
         /** solver constructor
 
@@ -28,8 +30,13 @@ public class WordPuzzleSolver {
         col = 0;
         directionIndex = 0;
         length = 1;
+        checkCounter = 0;
 
         directions = Direction.values();
+    }
+
+    public long getCheckCounter(){
+        return checkCounter;
     }
 
     public SolverStep nextStep(){
@@ -51,6 +58,7 @@ public class WordPuzzleSolver {
                 if(length == 1){
 
                     String letter = String.valueOf(grid[row][col]).toLowerCase();
+                    checkCounter++;
 
                     if(!dictionary.isPrefix(letter)){
 
@@ -85,6 +93,7 @@ public class WordPuzzleSolver {
                         length = 2;
                         continue;
                     }
+                    checkCounter++;
 
                     if(!dictionary.isPrefix(word)){
 
