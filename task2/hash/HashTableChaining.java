@@ -10,6 +10,7 @@ public class HashTableChaining {
     private List<Integer>[] table;
     private HashFunction hashFunction;
 
+    @SuppressWarnings("unchecked")
     public HashTableChaining(int size) {
     /**
      * Constructor that initializes the hash table using separate chaining.

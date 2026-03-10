@@ -4,6 +4,7 @@ import task3.gui.PuzzleGUI;
 
 public class Main {
    public static void main(String[] var0) {
-      new PuzzleGUI();
+      @SuppressWarnings("unused")
+      PuzzleGUI gui = new PuzzleGUI();
    }
 }
