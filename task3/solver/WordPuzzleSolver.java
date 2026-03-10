@@ -4,15 +4,15 @@ package task3.solver;
 
 public class WordPuzzleSolver {
 
-    private char[][] grid;
-    private Dictionary dictionary;
+    private final char[][] grid;
+    private final Dictionary dictionary;
 
     private int row;
     private int col;
     private int directionIndex;
     private int length;
 
-    private Direction[] directions;
+    private final Direction[] directions;
 
     private long checkCounter;
 

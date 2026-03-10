@@ -63,9 +63,7 @@ public class TaskB {
         // Copy array into temporary array to show steps
         int n = input.length;
         int[] arr = new int[n + 1];
-        for(int i = 0; i < n; i++){
-            arr[i + 1] = input[i];
-        }
+        System.arraycopy(input, 0, arr, 1, n);
 
         sb.append("Steg 0 – Utgångsläge (arrayen kopierad):\n");
         sb.append("  [");

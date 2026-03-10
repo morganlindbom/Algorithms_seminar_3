@@ -7,8 +7,8 @@ import java.util.List;
 
 public class HashTableChaining {
 
-    private List<Integer>[] table;
-    private HashFunction hashFunction;
+    private final List<Integer>[] table;
+    private final HashFunction hashFunction;
 
     @SuppressWarnings("unchecked")
     public HashTableChaining(int size) {

@@ -4,7 +4,7 @@ package task2.hash;
 
 public class HashFunction {
 
-    private int tableSize;
+    private final int tableSize;
 
     public HashFunction(int tableSize) {
     /**

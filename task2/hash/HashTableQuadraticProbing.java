@@ -4,8 +4,8 @@ package task2.hash;
 
 public class HashTableQuadraticProbing {
 
-    private Integer[] table;
-    private HashFunction hashFunction;
+    private final Integer[] table;
+    private final HashFunction hashFunction;
 
     public HashTableQuadraticProbing(int size) {
     /**

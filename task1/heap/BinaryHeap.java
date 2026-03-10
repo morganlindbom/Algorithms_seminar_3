@@ -4,7 +4,7 @@ package task1.heap;
 
 public class BinaryHeap {
 
-    private int[] heap;
+    private final int[] heap;
     private int size;
 
     public BinaryHeap(int capacity){
@@ -100,9 +100,7 @@ public class BinaryHeap {
 
         size = array.length;
 
-        for(int i = 0; i < array.length; i++){
-            heap[i + 1] = array[i];
-        }
+        System.arraycopy(array, 0, heap, 1, array.length);
 
         for(int i = size / 2; i > 0; i--){
             percolateDown(i);

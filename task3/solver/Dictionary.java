@@ -76,7 +76,7 @@ public class Dictionary {
                 }
             }
 
-        }catch(Exception e){
+        }catch(java.io.IOException e){
 
             System.out.println("Dictionary load failed: " + e.getMessage());
 
