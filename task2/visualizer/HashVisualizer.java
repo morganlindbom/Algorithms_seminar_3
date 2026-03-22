@@ -160,13 +160,20 @@ public class HashVisualizer implements Runnable {
             if (algorithm.equals("LINEAR")) {
 
                 int probeIndex = index;
-                while (linear.getTable()[probeIndex] != null) {
+                int checked = 1;
+                while (linear.getTable()[probeIndex] != null && checked < linear.getTable().length) {
                     process.append("Collision detected at index ").append(probeIndex).append("\n");
-                    probeIndex = (probeIndex + 1) % 10;
+                    probeIndex = (probeIndex + 1) % linear.getTable().length;
                     process.append("Linear probing -> checking index ").append(probeIndex).append("\n");
+                    checked++;
                 }
-                finalIndex = linear.insert(number);
-                process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
+                if (linear.getTable()[probeIndex] != null) {
+                    process.append("Table is full. Could not insert ").append(number).append(".\n\n");
+                    finalIndex = -1;
+                } else {
+                    finalIndex = linear.insert(number);
+                    process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
+                }
 
             }
 
@@ -174,14 +181,21 @@ public class HashVisualizer implements Runnable {
 
                 int probeIndex = index;
                 int step = 1;
-                while (quadratic.getTable()[probeIndex] != null) {
+                int checked = 1;
+                while (quadratic.getTable()[probeIndex] != null && checked < quadratic.getTable().length) {
                     process.append("Collision detected at index ").append(probeIndex).append("\n");
-                    probeIndex = (index + (step * step)) % 10;
+                    probeIndex = (index + (step * step)) % quadratic.getTable().length;
                     process.append("Quadratic probing -> checking index ").append(probeIndex).append("\n");
                     step++;
+                    checked++;
                 }
-                finalIndex = quadratic.insert(number);
-                process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
+                if (quadratic.getTable()[probeIndex] != null) {
+                    process.append("Table is full. Could not insert ").append(number).append(".\n\n");
+                    finalIndex = -1;
+                } else {
+                    finalIndex = quadratic.insert(number);
+                    process.append("Inserted ").append(number).append(" at index ").append(finalIndex).append("\n\n");
+                }
 
             }
 
@@ -189,12 +203,14 @@ public class HashVisualizer implements Runnable {
 
             if (algorithm.equals("CHAINING")) {
                 appendValue(finalIndex, number);
-            } else {
+            } else if (finalIndex >= 0) {
                 insertValue(finalIndex, number);
             }
 
             highlightNumberInserted(i);
-            highlightInserted(finalIndex);
+            if (finalIndex >= 0) {
+                highlightInserted(finalIndex);
+            }
 
             sleep(delay);
 

@@ -49,14 +49,19 @@ public class HashTableLinearProbing {
      * index 6
      *
      * until an empty slot is found.
+     *
+     * Returns the inserted index, or -1 if the table is full.
      */
 
         int index = hashFunction.hash(value);
+        int checked = 1;
 
-        while (table[index] != null) {
-
+        while (table[index] != null && checked < table.length) {
             index = (index + 1) % table.length;
-
+            checked++;
+        }
+        if (table[index] != null) {
+            return -1;
         }
 
         table[index] = value;
