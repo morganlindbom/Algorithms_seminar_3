@@ -7,7 +7,7 @@ import task1.heap.BinaryHeap;
 public class TaskB {
 
     public static String run(){
-        return run(new int[]{10,12,1,14,6,5,8,15,3,9,7,4,11,13,2});
+        return run(new int[]{45, 23, 78, 12, 9, 33, 67, 50, 4, 16, 81, 29, 5, 44, 100});
     }
 
     public static String run(int[] input){

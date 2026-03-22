@@ -14,7 +14,7 @@ public class TaskC {
         and level-order.
         */
 
-        int[] input = {10,12,1,14,6,5,8,15,3,9,7,4,11,13,2};
+        int[] input = {45, 23, 78, 12, 9, 33, 67, 50, 4, 16, 81, 29, 5, 44, 100};
 
         // Tree 1: built by inserting one at a time
         BinaryHeap tree1 = new BinaryHeap(50);
