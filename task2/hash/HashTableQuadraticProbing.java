@@ -58,16 +58,22 @@ public class HashTableQuadraticProbing {
      * try index = 3 + 1^2 = 4
      * try index = 3 + 2^2 = 7
      * try index = 3 + 3^2 = 12 mod 10 = 2
+     *
+     * Returns the inserted index, or -1 if no slot can be found.
      */
 
         int index = hashFunction.hash(value);
+        int initialIndex = index;
         int i = 1;
+        int checked = 1;
 
-        while (table[index] != null) {
-
-            index = (hashFunction.hash(value) + (i * i)) % table.length;
+        while (table[index] != null && checked < table.length) {
+            index = (initialIndex + (i * i)) % table.length;
             i++;
-
+            checked++;
+        }
+        if (table[index] != null) {
+            return -1;
         }
 
         table[index] = value;
